@@ -1,0 +1,44 @@
+{
+  "row_count": 61524,
+  "polluted_row_count": 3050,
+  "clean_row_count": 58474,
+  "valid_polluted_datetime_count": 3050,
+  "BEFORE": {
+    "MAE": 134898.0347872131,
+    "MedAE": 10.195,
+    "RMSE": 288739.7959994
+  },
+  "AFTER": {
+    "MAE": 18759.4669704918,
+    "MedAE": 97.9045,
+    "RMSE": 43635.87823636744
+  },
+  "IMPROVEMENT": {
+    "MAE_reduction": 116138.5678167213,
+    "RMSE_reduction": 245103.9177630326
+  },
+  "polluted_string_exact_match_rate": 0.0,
+  "polluted_datetime_exact_match_rate": 0.0,
+  "clean_string_exact_match_rate": 1.0,
+  "clean_datetime_exact_match_rate": 1.0,
+  "overall_string_exact_match_rate": 0.9504258500747675,
+  "overall_datetime_exact_match_rate": 0.9504258500747675,
+  "clean_changed_rate": 0.0,
+  "polluted_changed_rate": 1.0,
+  "overall_changed_rate": 0.04957414992523243,
+  "strict_monotonic_case_rate": 0.782,
+  "ORDERING": {
+    "polluted_block_count": 1500,
+    "baseline_valid_order_eval_block_count": 1500,
+    "baseline_block_exact_order_match_rate": 0.236,
+    "baseline_pairwise_order_accuracy": 0.26125,
+    "baseline_position_accuracy": 0.2419672131147541,
+    "valid_order_eval_block_count": 1500,
+    "block_exact_order_match_rate": 0.9273333333333333,
+    "pairwise_order_accuracy": 0.931875,
+    "position_accuracy": 0.9285245901639344,
+    "block_exact_order_match_improvement": 0.6913333333333334,
+    "pairwise_order_accuracy_improvement": 0.670625,
+    "position_accuracy_improvement": 0.6865573770491803
+  }
+}

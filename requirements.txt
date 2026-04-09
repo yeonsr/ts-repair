@@ -1,0 +1,17 @@
+pandas>=1.5
+numpy>=1.23
+scikit-learn>=1.2
+
+# LSTM baseline
+tensorflow>=2.12,<2.16
+
+# optional (safe parsing / utilities)
+python-dateutil>=2.8pandas>=1.5
+numpy>=1.23
+scikit-learn>=1.2
+
+# LSTM baseline
+tensorflow>=2.12,<2.16
+
+# optional (safe parsing / utilities)
+python-dateutil>=2.8

@@ -1,0 +1,244 @@
+You are given an event log CSV file with the following columns:
+
+- Case: case identifier
+- Activity: activity label (string)
+- Timestamp: timestamp string
+- Resource: resource identifier
+
+The dataset may contain form-based timestamp errors.
+
+Your task is to generate a complete and executable Python script that repairs ONLY form-based errors.
+
+---------------------------------------------------------------------
+DEFINITION OF FORM-BASED ERROR
+---------------------------------------------------------------------
+
+A form-based error occurs when multiple consecutive original events are:
+
+- collapsed into the same observed timestamp
+- AND their internal order may be arbitrarily shuffled
+
+Example:
+
+Original:
+  A > B > C > D > E
+
+Observed:
+  A > C > D > B > E
+
+---------------------------------------------------------------------
+CORE TASK
+---------------------------------------------------------------------
+
+You must:
+
+1. Detect corrupted segments
+2. Reconstruct the most plausible original subsequence
+3. Assign realistic timestamps based on learned temporal patterns
+
+IMPORTANT:
+This is NOT just ordering — it is also a temporal reconstruction problem.
+
+---------------------------------------------------------------------
+STEP 1 — Parse Input
+---------------------------------------------------------------------
+
+- Read CSV from sys.argv[1]
+- Use ONLY:
+  Case, Activity, Timestamp, Resource
+- Preserve original row order
+
+---------------------------------------------------------------------
+STEP 2 — Detect Corrupted Segments
+---------------------------------------------------------------------
+
+Within each Case:
+
+Group rows by identical Timestamp.
+
+A group is a corrupted segment if:
+- size >= 2
+- AND activities are not all identical
+
+Treat each group as a single segment.
+
+---------------------------------------------------------------------
+STEP 3 — Build Clean Reference Model
+---------------------------------------------------------------------
+
+From clean parts of the dataset, build:
+
+1. Transition statistics
+   - pair counts
+   - triple counts
+   - higher-order fragments
+
+2. Temporal statistics (CRITICAL)
+   - distribution of time differences between consecutive activities
+   - e.g. Δt(A → B)
+
+3. Fragment-level duration profiles
+   - for sequences like:
+     A → B → C → D
+   store typical relative durations:
+     Δt(A→B), Δt(B→C), Δt(C→D)
+
+IMPORTANT:
+Temporal patterns must be learned from CLEAN traces only.
+
+---------------------------------------------------------------------
+STEP 4 — Identify Anchors
+---------------------------------------------------------------------
+
+For each segment:
+
+- left_anchor  = nearest clean event before
+- right_anchor = nearest clean event after
+
+Let:
+- left_act, left_ts
+- right_act, right_ts
+
+---------------------------------------------------------------------
+STEP 5 — Reconstruct Segment Order
+---------------------------------------------------------------------
+
+Find the most plausible ordering of activities inside the segment.
+
+Use scoring based on:
+
+1. Anchor compatibility
+2. Internal transitions
+3. Higher-order fragments
+4. Clean trace fragment matching
+
+CRITICAL:
+Do NOT keep original order by default.
+
+---------------------------------------------------------------------
+STEP 6 — Estimate Duration Profile (NEW)
+---------------------------------------------------------------------
+
+After selecting the best order:
+
+Let reconstructed sequence be:
+
+  left_act → a1 → a2 → ... → ak → right_act
+
+Estimate expected durations:
+
+- Δ1 = expected time from left_act → a1
+- Δ2 = expected time from a1 → a2
+- ...
+- Δk = expected time from ak → right_act
+
+Use clean trace statistics:
+
+- mean / median durations per activity pair
+- or fragment-level duration patterns if available
+
+If exact pattern not available:
+- fallback to pairwise duration averages
+
+---------------------------------------------------------------------
+STEP 7 — Timestamp Assignment (CRITICAL CHANGE)
+---------------------------------------------------------------------
+
+DO NOT evenly divide time gaps.
+
+Instead:
+
+CASE 1: both anchors exist
+
+Let:
+  total_gap = right_ts - left_ts
+  expected_durations = [Δ1, Δ2, ..., Δk]
+
+Compute weights:
+
+  w_i = Δi / sum(Δ)
+
+Assign timestamps:
+
+  t1 = left_ts + total_gap * w1
+  t2 = t1 + total_gap * w2
+  ...
+
+Thus timestamps follow learned duration proportions.
+
+--------------------------------------------------
+
+CASE 2: only left anchor exists
+
+- use cumulative expected durations:
+  t1 = left_ts + Δ1
+  t2 = t1 + Δ2
+  ...
+
+--------------------------------------------------
+
+CASE 3: only right anchor exists
+
+- assign backwards using durations
+
+--------------------------------------------------
+
+CASE 4: no anchors
+
+- use duration profile starting from minimal baseline
+
+--------------------------------------------------
+
+IMPORTANT:
+
+- durations must reflect real process timing patterns
+- not uniform spacing
+
+---------------------------------------------------------------------
+STEP 8 — Apply Repair
+---------------------------------------------------------------------
+
+- DO NOT reorder rows
+- Only modify Timestamp values
+
+---------------------------------------------------------------------
+STEP 9 — Preserve Clean Data
+---------------------------------------------------------------------
+
+For rows NOT in corrupted segments:
+
+- DO NOT modify Timestamp
+- keep EXACT original string
+
+---------------------------------------------------------------------
+FORBIDDEN BEHAVIOR
+---------------------------------------------------------------------
+
+DO NOT:
+
+- use uniform spacing between events
+- assign timestamps before determining order
+- rely only on pairwise ordering
+- modify clean rows
+- reorder rows
+
+---------------------------------------------------------------------
+EXPECTED HELPER FUNCTIONS
+---------------------------------------------------------------------
+
+- detect_segments(...)
+- build_transition_stats(...)
+- build_duration_stats(...)
+- reconstruct_sequence(...)
+- estimate_durations(...)
+- assign_weighted_timestamps(...)
+- apply_repair(...)
+
+---------------------------------------------------------------------
+OUTPUT REQUIREMENTS
+---------------------------------------------------------------------
+
+- Return ONLY runnable Python code
+- Wrap in ```python ... ```
+- Use pandas
+- Read from sys.argv[1], write to sys.argv[2]
