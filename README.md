@@ -1,26 +1,39 @@
-This repository contains the supplementary material for the submitted paper on timestamp repair in process mining.
+This repository contains supplementary material for a submitted paper on timestamp repair in process mining.
 
-## Contents
-- Prompt used for LLM-based code generation
-- Execution pipeline for code-generation-based repair
-- Baseline implementations:
-  - median-based repair
-  - process-aware LSTM repair
-- Example input/output files
-- Reproduction instructions
+## Overview
 
-## Task
-The goal is to repair form-based timestamp errors in event logs while preserving row order and modifying only timestamps inside corrupted blocks.
+We study timestamp repair under form-based event capture, where multiple events share identical timestamps and their internal order is ambiguous.
+
+We compare three approaches:
+
+- Statistical baseline (median-based)
+- Predictive model (LSTM)
+- LLM-based program synthesis (proposed method)
+
+## Task Definition
+
+Given an event log with columns:
+
+- Case
+- Activity
+- Timestamp
+- Resource
+
+The goal is to:
+
+- Detect form-based corrupted segments
+- Reconstruct event ordering
+- Repair timestamps
+- Preserve row order
 
 ## Repository Structure
-- `code/baselines/`: baseline implementations
-- `code/llm/`: prompt and code-generation pipeline
-- `data/sample/`: small anonymized example input
-- `results/`: example outputs and summary metrics
-- `docs/reproduction.md`: step-by-step reproduction guide
+code/baselines/median_baseline.py
+code/baselines/lstm_baseline.py
+llm/prompt.txt
+run_codegen_experiment.py
+example_generated_repair.py
 
-## Requirements
-Install dependencies:
+data/Credit
+data/Pub
 
-```bash
-pip install -r requirements.txt
+results/
